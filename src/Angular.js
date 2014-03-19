@@ -760,7 +760,10 @@ function isLeafNode (node) {
  </file>
  </example>
  */
-function copy(source, destination){
+window.slowest = 0; 
+function copy(source, destination, recurse){
+  if (!recurse) var d = performance.now(), d2;
+  
   if (isWindow(source) || isScope(source)) {
     throw ngMinErr('cpws',
       "Can't copy! Making copies of Window or Scope instances is not supported.");
@@ -798,6 +801,14 @@ function copy(source, destination){
       setHashKey(destination,h);
     }
   }
+  
+  if (!recurse &&
+      (d2 = performance.now()) - d > slowest) {
+    slowest = d2 - d;
+    console.log(toJson(source), slowest);
+    console.trace();    
+  }
+  
   return destination;
 }
 
